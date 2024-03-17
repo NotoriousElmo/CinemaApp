@@ -18,7 +18,7 @@ public class TicketDataAccessService implements ITicketDAO {
     public List<Ticket> selectTickets() {
         String sql = """
                 SELECT *
-                FROM ticket 
+                FROM ticket
                 LIMIT 100;
                 """;
 
@@ -28,12 +28,11 @@ public class TicketDataAccessService implements ITicketDAO {
     @Override
     public int insertTicket(Ticket ticket) {
         String sql = """
-            INSERT INTO ticket(price, taken, seat, showing) 
-            VALUES (?, ?, ?, ?);
+            INSERT INTO ticket(price, seat, showing)
+            VALUES (?, ?, ?);
             """;
         return jdbcTemplate.update(sql,
                 ticket.price(),
-                ticket.taken(),
                 ticket.seat(),
                 ticket.showing());
     }
@@ -41,7 +40,7 @@ public class TicketDataAccessService implements ITicketDAO {
     @Override
     public int deleteTicket(int id) {
         String sql = """
-                DELETE 
+                DELETE
                 FROM ticket
                 WHERE id = ?;
                 """;

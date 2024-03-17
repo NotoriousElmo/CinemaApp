@@ -20,7 +20,6 @@ public class MovieGenreService {
     }
 
     public void addNewMovieGenre(MovieGenre movieGenre) {
-        // TODO: check if movie exists
         int result = movieGenreDAO.insertMovieGenre(movieGenre);
         if (result != 1) {
             throw new IllegalStateException("oops something went wrong");
@@ -32,7 +31,7 @@ public class MovieGenreService {
         movieGenres.ifPresentOrElse(movieGenre -> {
             int result = movieGenreDAO.deleteMovieGenre(id);
             if (result != 1) {
-                throw new IllegalStateException("oops could not delete movie");
+                throw new IllegalStateException("oops could not delete movieGenre");
             }
         }, () -> {
             throw new NotFoundException(String.format("MovieGenre with id %s not found", id));

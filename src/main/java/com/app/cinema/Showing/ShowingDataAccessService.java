@@ -18,7 +18,7 @@ public class ShowingDataAccessService implements IShowingDAO {
     public List<Showing> selectShowings() {
         String sql = """
                 SELECT *
-                FROM showing 
+                FROM showing
                 LIMIT 100;
                 """;
 
@@ -28,7 +28,7 @@ public class ShowingDataAccessService implements IShowingDAO {
     @Override
     public int insertShowing(Showing showing) {
         String sql = """
-            INSERT INTO showing(start) 
+            INSERT INTO showing(start)
             VALUES (?);
             """;
         return jdbcTemplate.update(sql,
@@ -38,7 +38,7 @@ public class ShowingDataAccessService implements IShowingDAO {
     @Override
     public int deleteShowing(int id) {
         String sql = """
-                DELETE 
+                DELETE
                 FROM showing
                 WHERE id = ?;
                 """;

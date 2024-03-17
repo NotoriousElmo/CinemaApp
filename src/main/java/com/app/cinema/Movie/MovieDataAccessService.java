@@ -18,7 +18,7 @@ public class MovieDataAccessService implements IMovieDAO {
     public List<Movie> selectMovies() {
         String sql = """
                 SELECT *
-                FROM movie 
+                FROM movie
                 LIMIT 100;
                 """;
 
@@ -28,7 +28,7 @@ public class MovieDataAccessService implements IMovieDAO {
     @Override
     public int insertMovie(Movie movie) {
         String sql = """
-            INSERT INTO movie(name, age, language, length_minutes) 
+            INSERT INTO movie(name, age, language, length_minutes)
             VALUES (?, ?, ?, ?);
             """;
         return jdbcTemplate.update(sql,
@@ -41,7 +41,7 @@ public class MovieDataAccessService implements IMovieDAO {
     @Override
     public int deleteMovie(int id) {
         String sql = """
-                DELETE 
+                DELETE
                 FROM movie
                 WHERE id = ?;
                 """;

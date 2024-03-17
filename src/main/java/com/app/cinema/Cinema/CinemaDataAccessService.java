@@ -18,7 +18,7 @@ public class CinemaDataAccessService implements ICinemaDAO {
     public List<Cinema> selectCinemas() {
         String sql = """
                 SELECT *
-                FROM cinema 
+                FROM cinema
                 LIMIT 100;
                 """;
 
@@ -28,7 +28,7 @@ public class CinemaDataAccessService implements ICinemaDAO {
     @Override
     public int insertCinema(Cinema cinema) {
         String sql = """
-            INSERT INTO cinema(name, city, street, building) 
+            INSERT INTO cinema(name, city, street, building)
             VALUES (?, ?, ?, ?);
             """;
         return jdbcTemplate.update(sql,
@@ -41,7 +41,7 @@ public class CinemaDataAccessService implements ICinemaDAO {
     @Override
     public int deleteCinema(int id) {
         String sql = """
-                DELETE 
+                DELETE
                 FROM cinema
                 WHERE id = ?;
                 """;

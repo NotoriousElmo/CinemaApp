@@ -11,7 +11,6 @@ public class TicketRowMapper implements RowMapper<Ticket> {
         return new Ticket(
                 resultSet.getInt("id"),
                 resultSet.getFloat("price"),
-                resultSet.getBoolean("taken"),
                 resultSet.getInt("seat"),
                 resultSet.getInt("showing")
         );

@@ -18,7 +18,7 @@ public class GenreDataAccessService implements IGenreDAO {
     public List<Genre> selectGenres() {
         String sql = """
                 SELECT *
-                FROM genre 
+                FROM genre
                 LIMIT 100;
                 """;
 
@@ -28,7 +28,7 @@ public class GenreDataAccessService implements IGenreDAO {
     @Override
     public int insertGenre(Genre genre) {
         String sql = """
-            INSERT INTO genre(name) 
+            INSERT INTO genre(name)
             VALUES (?);
             """;
         return jdbcTemplate.update(sql,
@@ -38,7 +38,7 @@ public class GenreDataAccessService implements IGenreDAO {
     @Override
     public int deleteGenre(int id) {
         String sql = """
-                DELETE 
+                DELETE
                 FROM genre
                 WHERE id = ?;
                 """;

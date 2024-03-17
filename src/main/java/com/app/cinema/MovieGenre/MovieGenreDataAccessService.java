@@ -18,8 +18,8 @@ public class MovieGenreDataAccessService implements IMovieGenreDAO {
     @Override
     public List<MovieGenre> selectMovieGenres() {
         String sql = """
-                SELECT * 
-                FROM movie_genre 
+                SELECT *
+                FROM movie_genre
                 LIMIT 100;
                 """;
 
@@ -39,7 +39,7 @@ public class MovieGenreDataAccessService implements IMovieGenreDAO {
     @Override
     public int deleteMovieGenre(int id) {
         String sql = """
-                DELETE 
+                DELETE
                 FROM movie_genre
                 WHERE id = ?;
                 """;
@@ -50,7 +50,7 @@ public class MovieGenreDataAccessService implements IMovieGenreDAO {
     @Override
     public Optional<MovieGenre> selectMovieGenreById(int id) {
         String sql = """
-                SELECT * 
+                SELECT *
                 FROM movie_genre
                 WHERE id = ?;
                 """;

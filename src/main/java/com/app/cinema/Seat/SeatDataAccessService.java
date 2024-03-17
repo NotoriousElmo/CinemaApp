@@ -1,6 +1,5 @@
 package com.app.cinema.Seat;
 
-import com.app.cinema.Movie.MovieRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -20,7 +19,7 @@ public class SeatDataAccessService implements ISeatDAO {
     public List<Seat> selectSeats() {
         String sql = """
                 SELECT *
-                FROM seat 
+                FROM seat
                 LIMIT 100;
                 """;
 
@@ -30,7 +29,7 @@ public class SeatDataAccessService implements ISeatDAO {
     @Override
     public int insertSeat(Seat seat) {
         String sql = """
-            INSERT INTO seat(room, code) 
+            INSERT INTO seat(room, code)
             VALUES (?, ?);
             """;
         return jdbcTemplate.update(sql,
@@ -41,7 +40,7 @@ public class SeatDataAccessService implements ISeatDAO {
     @Override
     public int deleteSeat(int id) {
         String sql = """
-                DELETE 
+                DELETE
                 FROM seat
                 WHERE id = ?;
                 """;
