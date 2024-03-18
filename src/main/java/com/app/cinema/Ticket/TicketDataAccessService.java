@@ -17,10 +17,16 @@ public class TicketDataAccessService implements ITicketDAO {
     @Override
     public List<Ticket> selectTickets() {
         String sql = """
-                SELECT *
-                FROM ticket
-                LIMIT 100;
-                """;
+            SELECT t.id, t.price,
+                   s.code, s.room,
+                   sh.start,
+                   m.name, m.age, m.language, m.length_minutes
+            FROM ticket t
+            LEFT JOIN seat s ON t.seat = s.id
+            LEFT JOIN showing sh ON t.showing = sh.id
+            LEFT JOIN movie m ON sh.movie = m.id
+            LIMIT 100;
+            """;
 
         return jdbcTemplate.query(sql, new TicketRowMapper());
     }
