@@ -28,7 +28,7 @@ function main () {
         for (let i = 0, len = data.length; i < len; i++) {
             let showingDate = new Date(data[i]['showing']);
             let now = new Date();
-            if (showingDate > now) {
+            if (showingDate < now) {
                 let row = document.createElement('tr');
                 for (let j = 0; j < headers.length; j++) {
                     let td = document.createElement('td');

@@ -13,9 +13,15 @@ public class ShowingRowMapper implements RowMapper<Showing> {
         return new Showing(
                 resultSet.getInt("id"),
                 Timestamp.valueOf(resultSet.getString("start")),
-                List.of(),
-                resultSet.getInt("cinema"),
-                resultSet.getInt("movie")
+                resultSet.getInt("movieId"),
+                resultSet.getString("movie"),
+                resultSet.getString("age"),
+                resultSet.getInt("cinemaId"),
+                resultSet.getString("cinema"),
+                resultSet.getString("room"),
+                resultSet.getInt("length_minutes"),
+                resultSet.getString("language"),
+                resultSet.getFloat("price")
         );
     }
 }
