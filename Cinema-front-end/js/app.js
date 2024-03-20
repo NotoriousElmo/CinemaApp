@@ -7,13 +7,14 @@ function main () {
     })
     .then(response => response.json())
     .then(data => {
+        console.log(data);
 
         let table = document.createElement('table');
         table.style.borderSpacing = "30px"; // Add more space between cells
 
         let thead = document.createElement('thead');
         let headerRow = document.createElement('tr');
-        let headers = ['Kuupäev / Kell', 'Film', 'Ruum', 'Istekoht', 'Vanusepiirang','Keel', 'Pikkus minutites', 'Hind'];
+        let headers = ['Kuupäev ja Kellaaeg', 'Film', 'Ruum', 'Istekoht', 'Vanusepiirang','Keel', 'Pikkus minutites', 'Hind'];
         let dataHeaders = ['showing', 'movie', 'room', 'seat', 'age', 'language', 'length_minutes', 'price'];
         
         for (let header of headers) {
@@ -25,7 +26,7 @@ function main () {
         table.appendChild(thead);
         
         let tbody = document.createElement('tbody');
-        for (let i = 0, len = data.length; i < len; i++) {
+        for (let i = 0; i < data.length; i++) {
             let showingDate = new Date(data[i]['showing']);
             let now = new Date();
             if (showingDate > now) {
@@ -37,7 +38,13 @@ function main () {
                         td.textContent = data[i][dataHeaders[j]];
                     }
                     else if (dataHeaders[j] === 'showing') {
-                        td.textContent = showingDate.toLocaleDateString() + ' / ' + showingDate.toLocaleTimeString();
+
+                        let formattedDate = ("0" + showingDate.getDate()).slice(-2) + '/' + ("0" + (showingDate.getMonth() + 1)).slice(-2) + '/' + showingDate.getFullYear();
+                    
+                        let formattedTime = ("0" + showingDate.getHours()).slice(-2) + ':' + ("0" + showingDate.getMinutes()).slice(-2);
+
+                        td.textContent = formattedDate + ' ' + formattedTime;
+
                     } else {
                         td.textContent = data[i][dataHeaders[j]];
                     }

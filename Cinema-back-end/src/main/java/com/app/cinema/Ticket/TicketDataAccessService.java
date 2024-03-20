@@ -18,8 +18,8 @@ public class TicketDataAccessService implements ITicketDAO {
     public List<Ticket> selectTickets() {
         String sql = """
             SELECT t.id, t.price,
-                   s.code, s.room,
-                   sh.start,
+                   s.id as seatId, s.code, s.room,
+                   sh.id as showingId, sh.start,
                    m.name, m.age, m.language, m.length_minutes
             FROM ticket t
             LEFT JOIN seat s ON t.seat = s.id
@@ -39,8 +39,8 @@ public class TicketDataAccessService implements ITicketDAO {
             """;
         return jdbcTemplate.update(sql,
                 ticket.price(),
-                ticket.seat(),
-                ticket.showing());
+                ticket.seatId(),
+                ticket.showingId());
     }
 
     @Override

@@ -11,8 +11,10 @@ public class TicketRowMapper implements RowMapper<Ticket> {
         return new Ticket(
                 resultSet.getInt("id"),
                 resultSet.getFloat("price"),
+                resultSet.getInt("seatId"),
                 resultSet.getString("code"),
                 resultSet.getString("room"),
+                resultSet.getInt("showingId"),
                 resultSet.getTimestamp("start"),
                 resultSet.getString("name"),
                 resultSet.getString("age"),

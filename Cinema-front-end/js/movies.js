@@ -19,7 +19,6 @@ function showResults(ageLimit, genres, date, language) {
         removeAllChildNodes(mainDiv);
         main();
         console.log("back");
-        this.style.backgroundColor = "yellow";
     });
 
     mainDiv.appendChild(backButton);
@@ -34,27 +33,28 @@ function showResults(ageLimit, genres, date, language) {
         data = filterData(ageLimit, data, language, date, genres);
 
         let scrollableDiv = document.createElement('div');
-        scrollableDiv.style.width = '800px'
+        scrollableDiv.style.width = '900px'
         scrollableDiv.style.height = '500px';
         scrollableDiv.style.overflowY = 'auto';
         scrollableDiv.style.border = '1px solid #ccc';
     
-        let table = document.createElement('table');
-        table.style.borderSpacing = "30px";
-    
-        let thead = document.createElement('thead');
-        let headerRow = document.createElement('tr');
-        let headers = ['Kuupäev / Kell', 'Film', 'Ruum', 'Kino', 'Vanusepiirang', 'Keel', 'Pikkus minutites', 'Hind'];
-        let dataHeaders = ['start', 'movie', 'room', 'cinema', 'age', 'language', 'length_minutes', 'price'];
-    
-        createTable(headers, headerRow, thead, table, data, dataHeaders, scrollableDiv, mainDiv);
+        createTable(data, scrollableDiv, mainDiv);
     })
     .catch((error) => {
         console.error('Error:', error);
     });
 }
 
-function createTable(headers, headerRow, thead, table, data, dataHeaders, scrollableDiv, mainDiv) {
+function createTable(data, scrollableDiv, mainDiv) {
+
+    let table = document.createElement('table');
+    table.style.borderSpacing = "30px";
+
+    let thead = document.createElement('thead');
+    let headerRow = document.createElement('tr');
+    let headers = ['Kuupäev ja Kellaaeg', 'Film', 'Ruum', 'Kino', 'Vanus', 'Keel', 'Pikkus minutites', 'Hind', 'Osta Pilet'];
+    let dataHeaders = ['start', 'movie', 'room', 'cinema', 'age', 'language', 'length_minutes', 'price'];
+
     for (let header of headers) {
         let th = document.createElement('th');
         th.textContent = header;
@@ -71,12 +71,30 @@ function createTable(headers, headerRow, thead, table, data, dataHeaders, scroll
 
             if (dataHeaders[j] === 'start') {
                 let showingDate = new Date(data[i][dataHeaders[j]]);
-                td.textContent = showingDate.toLocaleDateString() + ' / ' + showingDate.toLocaleTimeString();
+
+                let formattedDate = ("0" + showingDate.getDate()).slice(-2) + '/' + ("0" + (showingDate.getMonth() + 1)).slice(-2) + '/' + showingDate.getFullYear();
+            
+                let formattedTime = ("0" + showingDate.getHours()).slice(-2) + ':' + ("0" + showingDate.getMinutes()).slice(-2);
+
+                td.textContent = formattedDate + ' ' + formattedTime;
             } else {
                 td.textContent = data[i][dataHeaders[j]];
             }
             row.appendChild(td);
         }
+
+        let input = document.createElement('input');
+        input.type = 'number';
+        input.min = 1;
+        input.max = 5;
+        input.value = 1;
+        input.id = 'ticketCount' + i;
+        localStorage.setItem(data[i]['id'], input.value);
+        input.addEventListener('change', function() {
+            console.log(data[i]['id']);
+            localStorage.setItem(data[i]['id'], input.value);
+        });
+        row.appendChild(input);
 
         let purchaseButton = document.createElement('button');
         purchaseButton.innerText = "Osta";
@@ -84,7 +102,7 @@ function createTable(headers, headerRow, thead, table, data, dataHeaders, scroll
         purchaseButton.style.borderStyle = 'solid';
         purchaseButton.style.borderWidth = '1px';
         purchaseButton.style.borderColor = "blue";
-        purchaseButton.style.marginTop = '20px';
+        purchaseButton.style.marginTop = '5px';
         purchaseButton.addEventListener('click', function() {
             console.log("Ostan");
             removeAllChildNodes(mainDiv);
@@ -128,7 +146,7 @@ function filterData(ageLimit, data, language, date, genres) {
 
         data = data.filter(showing => {
             const showingGenres = showing.genres.map(genre => genre.toLowerCase());
-            return showingGenres.some(genre => lowerCaseGenres.includes(genre));
+            return lowerCaseGenres.every(genre => showingGenres.includes(genre));
         });
     }
     return data;

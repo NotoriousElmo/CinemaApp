@@ -13,7 +13,7 @@ function main () {
 
         let thead = document.createElement('thead');
         let headerRow = document.createElement('tr');
-        let headers = ['Kuupäev / Kell', 'Film', 'Ruum', 'Istekoht', 'Vanusepiirang','Keel', 'Pikkus minutites', 'Hind'];
+        let headers = ['Kuupäev ja Kellaaeg', 'Film', 'Ruum', 'Istekoht', 'Vanusepiirang','Keel', 'Pikkus minutites', 'Hind'];
         let dataHeaders = ['showing', 'movie', 'room', 'seat', 'age', 'language', 'length_minutes', 'price'];
         
         for (let header of headers) {
@@ -37,7 +37,11 @@ function main () {
                         td.textContent = data[i][dataHeaders[j]];
                     }
                     else if (dataHeaders[j] === 'showing') {
-                        td.textContent = showingDate.toLocaleDateString() + ' / ' + showingDate.toLocaleTimeString();
+                        let formattedDate = ("0" + showingDate.getDate()).slice(-2) + '/' + ("0" + (showingDate.getMonth() + 1)).slice(-2) + '/' + showingDate.getFullYear();
+            
+                        let formattedTime = ("0" + showingDate.getHours()).slice(-2) + ':' + ("0" + showingDate.getMinutes()).slice(-2);
+        
+                        td.textContent = formattedDate + ' ' + formattedTime;
                     } else {
                         td.textContent = data[i][dataHeaders[j]];
                     }
