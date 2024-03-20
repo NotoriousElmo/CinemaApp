@@ -9,7 +9,7 @@ function showResults(ageLimit, genres, date, language) {
 
 
     let backButton = document.createElement("button");
-    backButton.innerText = "Back";
+    backButton.innerText = "Tagasi";
     backButton.style.backgroundColor = 'lightblue';
     backButton.style.borderStyle = 'solid';
     backButton.style.borderWidth = '1px';
@@ -31,26 +31,7 @@ function showResults(ageLimit, genres, date, language) {
     .then(response => response.json())
     .then(data => {
 
-        
-        if (ageLimit) {
-            data = data.filter(showing => showing.age === ageLimit);
-        }
-
-        if (language) {
-            data = data.filter(showing => showing.language.toLowerCase() === language.toLowerCase());
-        }
-
-        if (date) {
-            const selectedDate = new Date(date);
-            data = data.filter(showing => {
-                const showingDate = new Date(showing.start);
-                return showingDate >= selectedDate;
-            }).sort((a, b) => {
-                const dateA = new Date(a.start), dateB = new Date(b.start);
-                return dateA - dateB;
-            });
-        }
-
+        data = filterData(ageLimit, data, language, date, genres);
 
         let scrollableDiv = document.createElement('div');
         scrollableDiv.style.width = '800px'
@@ -66,39 +47,91 @@ function showResults(ageLimit, genres, date, language) {
         let headers = ['Kuupäev / Kell', 'Film', 'Ruum', 'Kino', 'Vanusepiirang', 'Keel', 'Pikkus minutites', 'Hind'];
         let dataHeaders = ['start', 'movie', 'room', 'cinema', 'age', 'language', 'length_minutes', 'price'];
     
-        for (let header of headers) {
-            let th = document.createElement('th');
-            th.textContent = header;
-            headerRow.appendChild(th);
-        }
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
-    
-        let tbody = document.createElement('tbody');
-        for (let i = 0, len = data.length; i < len; i++) {
-            let row = document.createElement('tr');
-            for (let j = 0; j < dataHeaders.length; j++) {
-                let td = document.createElement('td');
-    
-                if (dataHeaders[j] === 'start') {
-                    let showingDate = new Date(data[i][dataHeaders[j]]);
-                    td.textContent = showingDate.toLocaleDateString() + ' / ' + showingDate.toLocaleTimeString();
-                } else {
-                    td.textContent = data[i][dataHeaders[j]];
-                }
-                row.appendChild(td);
-            }
-            tbody.appendChild(row);
-        }
-        table.appendChild(tbody);
-    
-        scrollableDiv.appendChild(table);
-    
-        mainDiv.appendChild(scrollableDiv);
+        createTable(headers, headerRow, thead, table, data, dataHeaders, scrollableDiv, mainDiv);
     })
     .catch((error) => {
         console.error('Error:', error);
     });
+}
+
+function createTable(headers, headerRow, thead, table, data, dataHeaders, scrollableDiv, mainDiv) {
+    for (let header of headers) {
+        let th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    }
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    let tbody = document.createElement('tbody');
+    for (let i = 0, len = data.length; i < len; i++) {
+        let row = document.createElement('tr');
+        for (let j = 0; j < dataHeaders.length; j++) {
+            let td = document.createElement('td');
+
+            if (dataHeaders[j] === 'start') {
+                let showingDate = new Date(data[i][dataHeaders[j]]);
+                td.textContent = showingDate.toLocaleDateString() + ' / ' + showingDate.toLocaleTimeString();
+            } else {
+                td.textContent = data[i][dataHeaders[j]];
+            }
+            row.appendChild(td);
+        }
+
+        let purchaseButton = document.createElement('button');
+        purchaseButton.innerText = "Osta";
+        purchaseButton.style.backgroundColor = 'lightblue';
+        purchaseButton.style.borderStyle = 'solid';
+        purchaseButton.style.borderWidth = '1px';
+        purchaseButton.style.borderColor = "blue";
+        purchaseButton.style.marginTop = '20px';
+        purchaseButton.addEventListener('click', function() {
+            console.log("Ostan");
+            removeAllChildNodes(mainDiv);
+            localStorage.setItem('data', JSON.stringify(data[i]));
+            window.location.href = 'buy.html';
+        });
+
+        row.appendChild(purchaseButton);
+
+        tbody.appendChild(row);
+    }
+    table.appendChild(tbody);
+
+    scrollableDiv.appendChild(table);
+
+    mainDiv.appendChild(scrollableDiv);
+}
+
+function filterData(ageLimit, data, language, date, genres) {
+    if (ageLimit) {
+        data = data.filter(showing => showing.age === ageLimit);
+    }
+
+    if (language) {
+        data = data.filter(showing => showing.language.toLowerCase() === language.toLowerCase());
+    }
+
+    if (date) {
+        const selectedDate = new Date(date);
+        data = data.filter(showing => {
+            const showingDate = new Date(showing.start);
+            return showingDate >= selectedDate;
+        }).sort((a, b) => {
+            const dateA = new Date(a.start), dateB = new Date(b.start);
+            return dateA - dateB;
+        });
+    }
+
+    if (genres.length > 0) {
+        const lowerCaseGenres = genres.map(genre => genre.toLowerCase());
+
+        data = data.filter(showing => {
+            const showingGenres = showing.genres.map(genre => genre.toLowerCase());
+            return showingGenres.some(genre => lowerCaseGenres.includes(genre));
+        });
+    }
+    return data;
 }
 
 function main() {
@@ -113,7 +146,7 @@ function main() {
 
     let ageLimitContainer = createInputContainer();
     let ageLimitLabel = document.createElement("label");
-    ageLimitLabel.textContent = "Age limit: ";
+    ageLimitLabel.textContent = "Vanusepiirang: ";
     let ageLimitInput = document.createElement("input");
     ageLimitInput.type = "text";
     ageLimitContainer.appendChild(ageLimitLabel);
@@ -134,7 +167,7 @@ function main() {
 
     let dateTimeContainer = createInputContainer();
     let dateTimeLabel = document.createElement("label");
-    dateTimeLabel.textContent = "Date and Time: ";
+    dateTimeLabel.textContent = "Kuupäev ja kellaaeg: ";
     let dateTimeInput = document.createElement("input");
     dateTimeInput.type = "datetime-local";
     dateTimeContainer.appendChild(dateTimeLabel);
@@ -142,7 +175,7 @@ function main() {
 
     let languageContainer = createInputContainer();
     let languageLabel = document.createElement("label");
-    languageLabel.textContent = "Language: ";
+    languageLabel.textContent = "Keel: ";
     let languageInput = document.createElement("input");
     languageInput.type = "text";
     languageInput.placeholder = "Language";
@@ -153,7 +186,7 @@ function main() {
     let buttonContainer = createInputContainer();
     buttonContainer.style.textAlign = 'right';
     let recommendButton = document.createElement("button");
-    recommendButton.innerText = "Filter";
+    recommendButton.innerText = "Otsi";
     recommendButton.style.backgroundColor = 'lightblue';
     recommendButton.style.borderStyle = 'solid';
     recommendButton.style.borderWidth = '1px';
@@ -168,7 +201,7 @@ function main() {
 
         removeAllChildNodes(mainDiv);
         showResults(ageLimit, genres, date, language);
-        console.log("recommend");
+        console.log("Otsin");
     });
     buttonContainer.appendChild(recommendButton);
 

@@ -13,6 +13,7 @@ public record Showing(
         String room,
         Integer length_minutes,
         String language,
-        Float price
+        Float price,
+        String[] genres
 ) {
 }
