@@ -7,10 +7,8 @@ function main () {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
-
         let table = document.createElement('table');
-        table.style.borderSpacing = "30px"; // Add more space between cells
+        table.style.borderSpacing = "30px";
 
         let thead = document.createElement('thead');
         let headerRow = document.createElement('tr');
@@ -29,7 +27,7 @@ function main () {
         for (let i = 0; i < data.length; i++) {
             let showingDate = new Date(data[i]['showing']);
             let now = new Date();
-            if (showingDate > now) {
+            if (showingDate >= now) {
                 let row = document.createElement('tr');
                 for (let j = 0; j < headers.length; j++) {
                     let td = document.createElement('td');
@@ -65,5 +63,4 @@ function main () {
 }
 
 // ==================== ENTRY POINT ===================
-console.log("App startup...");
 main();

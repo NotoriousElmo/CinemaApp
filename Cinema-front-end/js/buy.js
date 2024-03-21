@@ -5,9 +5,14 @@ function removeAllChildNodes(parent) {
 }
 
 function purchaseTicket() {
-
+    let showing = JSON.parse(localStorage.getItem('data'));
+    const numberTickets = localStorage.getItem(showing['id']);
     let mainDiv = document.querySelector("#main");
 
+
+    let instructions = document.createElement("p");
+    instructions.innerText = "1) Valitud istekohad on kollased.\n2) Sa ei saa valida rohkem istekohtasid kui sa deklareerisid.\n3) Teiste istekohtade valimiseks vajutage kollaste istekohtade peale, et need siniseks muuta ja siis valige uued.";
+    mainDiv.appendChild(instructions);
 
     let backButton = document.createElement("button");
     backButton.innerText = "Tagasi";
@@ -20,17 +25,13 @@ function purchaseTicket() {
         removeAllChildNodes(mainDiv);
         localStorage.clear();
         window.location.href = 'movies.html';
-        console.log("back");
     });
 
     mainDiv.appendChild(backButton);
+
+    
     let table = document.createElement('table');
     table.style.borderSpacing = "30px";
-
-
-    let showing = JSON.parse(localStorage.getItem('data'));
-    const numberTickets = localStorage.getItem(showing['id']);
-    const ticketPrice = showing['price'];
 
     fetch('http://localhost:8080/api/seats', {
         method: 'GET',
@@ -38,8 +39,16 @@ function purchaseTicket() {
     .then(response => response.json())
     .then(data => {
 
+        let seats = data.map(element => ({
+            seatId: element['id'],
+            seatCode: element['seatCode'],
+            room: element['room'],
+            isTaken: Math.random() < 0.2,
+        }));
+
         let tbody = document.createElement('tbody');
-        let selectedSeats = [];
+        let selectedSeats = recommendSeats(seats, numberTickets);
+
         let screen = document.createElement('tr');
         screen.innerText = '------------------------- Ekraan -------------------------\n\n'
         screen.style.textAlign = 'center';
@@ -49,20 +58,26 @@ function purchaseTicket() {
             let row = document.createElement('tr');
         
             for (let i = index * 10; i < (index + 1) * 10; i++) {
-                const element = data[i];
+                const element = seats[i];
                 let seatButton = document.createElement('button');
-                seatButton.style.backgroundColor = Math.random() < 0.2 ? 'grey' : 'lightblue';
+
                 seatButton.style.borderStyle = 'solid';
                 seatButton.style.borderWidth = '1px';
                 seatButton.style.borderColor = 'blue';
                 seatButton.style.marginTop = '5px';
                 seatButton.style.width = '40px';
         
-                if (seatButton.style.backgroundColor === 'grey') {
+                if (element.isTaken) {
+                    seatButton.style.backgroundColor = 'grey';
                     seatButton.innerText = '-';
                     seatButton.disabled = true;
                 } else {
-                    seatButton.innerText = element['seatCode'];
+                    if (selectedSeats.includes(element)) {
+                        seatButton.style.backgroundColor = 'yellow';
+                    } else {                        
+                        seatButton.style.backgroundColor = 'lightblue';
+                    }
+                    seatButton.innerText = element.seatCode;
                     seatButton.addEventListener('click', function() {
                         if (this.style.backgroundColor === 'yellow') {
                             this.style.backgroundColor = 'lightblue';
@@ -76,8 +91,6 @@ function purchaseTicket() {
                                 selectedSeats.push(element);
                             }
                         }
-                        console.log(selectedSeats.length);
-                        console.log(numberTickets);
                     });
                 }
         
@@ -86,40 +99,84 @@ function purchaseTicket() {
         
             tbody.appendChild(row);
         }
-
         table.appendChild(tbody);
         mainDiv.appendChild(table);
 
-        let purchaseButton = document.createElement('button');
-        purchaseButton.innerText = "Edasi";
-        purchaseButton.style.backgroundColor = 'lightblue';
-        purchaseButton.style.borderStyle = 'solid';
-        purchaseButton.style.borderWidth = '1px';
-        purchaseButton.style.borderColor = "blue";
-        purchaseButton.style.marginTop = '5px';
-        purchaseButton.addEventListener('click', function() {
-            if (selectedSeats.length >= 1) {
-                console.log("Edasi");
-                removeAllChildNodes(mainDiv);
-
-                endPurchaseScreen(selectedSeats, ticketPrice, showing['movie'], showing['start'], showing['id']);
-            } else {
-                alert('Vähemalt üks istekoht peab olema valitud!');
-            }
-        });
+        let purchaseButton = createPurchaseButton(selectedSeats, mainDiv, showing);
 
         mainDiv.appendChild(purchaseButton);
     })
     .catch((error) => {
         console.error('Error:', error);
     });
+}
+
+function recommendSeats(seats, numberOfSeatsNeeded) {
+
+    const targetIndex = 25;
+
+    for (let i = targetIndex; i > 15 + parseInt(numberOfSeatsNeeded); i--) {
+        let group = seats.slice(i - parseInt(numberOfSeatsNeeded), i);
+        if (group.every(seat => !seat.isTaken)) {
+
+            return group;
+        }
+    }
+
+    for (let i = targetIndex; i < 35 - parseInt(numberOfSeatsNeeded); i++) {
+        let group = seats.slice(i, i + parseInt(numberOfSeatsNeeded));
+        if (group.every(seat => !seat.isTaken)) {
+
+            return group;
+        }
+    }
+
+    for (let i = targetIndex; i > parseInt(numberOfSeatsNeeded); i--) {
+        let group = seats.slice(i - parseInt(numberOfSeatsNeeded), i);
+        if (group.every(seat => !seat.isTaken)) {
+
+            return group;
+        }
+    }
+
+    for (let i = 35 - parseInt(numberOfSeatsNeeded); i < 50; i++) {
+        let group = seats.slice(i, i + parseInt(numberOfSeatsNeeded));
+        if (group.every(seat => !seat.isTaken)) {
+
+            return group;
+        }
+    }
 
 }
 
-function endPurchaseScreen(selectedSeats, price, movie, originalDate, showingId) {
+function createPurchaseButton(selectedSeats, mainDiv, showing) {
+    let purchaseButton = document.createElement('button');
+
+    purchaseButton.innerText = "Edasi";
+    purchaseButton.style.backgroundColor = 'lightblue';
+    purchaseButton.style.borderStyle = 'solid';
+    purchaseButton.style.borderWidth = '1px';
+    purchaseButton.style.borderColor = "blue";
+    purchaseButton.style.marginTop = '5px';
+
+    purchaseButton.addEventListener('click', function () {
+        if (selectedSeats.length >= 1) {
+            removeAllChildNodes(mainDiv);
+
+            endPurchaseScreen(selectedSeats, showing);
+        } else {
+            alert('Vähemalt üks istekoht peab olema valitud!');
+        }
+    });
+    return purchaseButton;
+}
+
+function endPurchaseScreen(selectedSeats, showing) {
+
+    const price = showing['price'];
+    let movie = showing['movie'];
     
     let mainDiv = document.querySelector("#main");
-
 
     let backButton = document.createElement("button");
     backButton.innerText = "Tagasi";
@@ -131,7 +188,6 @@ function endPurchaseScreen(selectedSeats, price, movie, originalDate, showingId)
     backButton.addEventListener('click', function() {
         removeAllChildNodes(mainDiv);
         purchaseTicket();
-        console.log("back");
     });
 
     mainDiv.appendChild(backButton);
@@ -154,13 +210,16 @@ function endPurchaseScreen(selectedSeats, price, movie, originalDate, showingId)
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
-    let date = new Date(originalDate);
+    let date = new Date(showing['start']);
 
     let formattedDate = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
-
     let formattedTime = ("0" + date.getHours()).slice(-2) + ':' + ("0" + date.getMinutes()).slice(-2);
     
     selectedSeats.forEach(element => {
+        console.log(element['seatId']);
+        console.log(element['seatCode']);
+        console.log(element['room']);
+
         let row = document.createElement('tr');
 
         let d = document.createElement('td');
@@ -195,29 +254,32 @@ function endPurchaseScreen(selectedSeats, price, movie, originalDate, showingId)
     purchaseButton.style.fontSize = '20px';
 
     purchaseButton.addEventListener('click', function() {
-        console.log('Ostetud');
-        console.log(selectedSeats[0]);
 
     for (let i = 0; i < selectedSeats.length; i++) {
+        let element = selectedSeats[i];
         let url = 'http://localhost:8080/api/tickets';
-        console.log(selectedSeats[i]['id']);
-        console.log(showingId);
-        console.log(price);
-        let data = {seat: selectedSeats[i]['id'], showing: showingId, price: price};
+        let data = {price: price, 
+            seatId: element['seatId'], 
+            seat: element['seatCode'], 
+            room: element['room'], 
+            showingId: showing['id'], 
+            showing: showing['start'], 
+            movie: showing['movie'], 
+            age: showing['age'], 
+            language: showing['language'], 
+            length_minutes: showing['length_minutes']};
         
         fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Connection': 'keep-alive'
+                'Connection': 'keep-alive',
+                'Origin': 'http://10.102.0.218:8081'
             },
             body: JSON.stringify(data)
         })
         .then(response => response.json())
-        .then(data => console.log(data))
         .catch((error) => {
-            console.log(response);
-            console.log(data);
             console.error('Error:', error);
         });
     }
@@ -230,5 +292,4 @@ function endPurchaseScreen(selectedSeats, price, movie, originalDate, showingId)
 
 
 // ==================== ENTRY POINT ===================
-console.log("Purchasing ticket...");
 purchaseTicket();

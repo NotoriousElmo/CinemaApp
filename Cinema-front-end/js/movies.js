@@ -6,9 +6,14 @@ function removeAllChildNodes(parent) {
 
 function showResults(ageLimit, genres, date, language) {
     let mainDiv = document.querySelector("#main");
-
-
     let backButton = document.createElement("button");
+    let scrollableDiv = document.createElement('div');
+
+    scrollableDiv.style.width = '900px'
+    scrollableDiv.style.height = '500px';
+    scrollableDiv.style.overflowY = 'auto';
+    scrollableDiv.style.border = '1px solid #ccc';
+
     backButton.innerText = "Tagasi";
     backButton.style.backgroundColor = 'lightblue';
     backButton.style.borderStyle = 'solid';
@@ -18,7 +23,6 @@ function showResults(ageLimit, genres, date, language) {
     backButton.addEventListener('click', function() {
         removeAllChildNodes(mainDiv);
         main();
-        console.log("back");
     });
 
     mainDiv.appendChild(backButton);
@@ -31,12 +35,6 @@ function showResults(ageLimit, genres, date, language) {
     .then(data => {
 
         data = filterData(ageLimit, data, language, date, genres);
-
-        let scrollableDiv = document.createElement('div');
-        scrollableDiv.style.width = '900px'
-        scrollableDiv.style.height = '500px';
-        scrollableDiv.style.overflowY = 'auto';
-        scrollableDiv.style.border = '1px solid #ccc';
     
         createTable(data, scrollableDiv, mainDiv);
     })
@@ -48,12 +46,14 @@ function showResults(ageLimit, genres, date, language) {
 function createTable(data, scrollableDiv, mainDiv) {
 
     let table = document.createElement('table');
-    table.style.borderSpacing = "30px";
-
     let thead = document.createElement('thead');
     let headerRow = document.createElement('tr');
+    let tbody = document.createElement('tbody');
+
     let headers = ['Kuupäev ja Kellaaeg', 'Film', 'Ruum', 'Kino', 'Vanus', 'Keel', 'Pikkus minutites', 'Hind', 'Osta Pilet'];
     let dataHeaders = ['start', 'movie', 'room', 'cinema', 'age', 'language', 'length_minutes', 'price'];
+
+    table.style.borderSpacing = "30px";
 
     for (let header of headers) {
         let th = document.createElement('th');
@@ -63,7 +63,6 @@ function createTable(data, scrollableDiv, mainDiv) {
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
-    let tbody = document.createElement('tbody');
     for (let i = 0, len = data.length; i < len; i++) {
         let row = document.createElement('tr');
         for (let j = 0; j < dataHeaders.length; j++) {
@@ -73,7 +72,6 @@ function createTable(data, scrollableDiv, mainDiv) {
                 let showingDate = new Date(data[i][dataHeaders[j]]);
 
                 let formattedDate = ("0" + showingDate.getDate()).slice(-2) + '/' + ("0" + (showingDate.getMonth() + 1)).slice(-2) + '/' + showingDate.getFullYear();
-            
                 let formattedTime = ("0" + showingDate.getHours()).slice(-2) + ':' + ("0" + showingDate.getMinutes()).slice(-2);
 
                 td.textContent = formattedDate + ' ' + formattedTime;
@@ -84,19 +82,20 @@ function createTable(data, scrollableDiv, mainDiv) {
         }
 
         let input = document.createElement('input');
+        let purchaseButton = document.createElement('button');
+
         input.type = 'number';
         input.min = 1;
         input.max = 5;
         input.value = 1;
         input.id = 'ticketCount' + i;
+
         localStorage.setItem(data[i]['id'], input.value);
+
         input.addEventListener('change', function() {
-            console.log(data[i]['id']);
             localStorage.setItem(data[i]['id'], input.value);
         });
-        row.appendChild(input);
 
-        let purchaseButton = document.createElement('button');
         purchaseButton.innerText = "Osta";
         purchaseButton.style.backgroundColor = 'lightblue';
         purchaseButton.style.borderStyle = 'solid';
@@ -104,24 +103,23 @@ function createTable(data, scrollableDiv, mainDiv) {
         purchaseButton.style.borderColor = "blue";
         purchaseButton.style.marginTop = '5px';
         purchaseButton.addEventListener('click', function() {
-            console.log("Ostan");
             removeAllChildNodes(mainDiv);
             localStorage.setItem('data', JSON.stringify(data[i]));
             window.location.href = 'buy.html';
         });
 
+        row.appendChild(input);
         row.appendChild(purchaseButton);
-
         tbody.appendChild(row);
     }
+
     table.appendChild(tbody);
-
     scrollableDiv.appendChild(table);
-
     mainDiv.appendChild(scrollableDiv);
 }
 
 function filterData(ageLimit, data, language, date, genres) {
+
     if (ageLimit) {
         data = data.filter(showing => showing.age === ageLimit);
     }
@@ -164,8 +162,9 @@ function main() {
 
     let ageLimitContainer = createInputContainer();
     let ageLimitLabel = document.createElement("label");
-    ageLimitLabel.textContent = "Vanusepiirang: ";
     let ageLimitInput = document.createElement("input");
+
+    ageLimitLabel.textContent = "Vanusepiirang: ";
     ageLimitInput.type = "text";
     ageLimitContainer.appendChild(ageLimitLabel);
     ageLimitContainer.appendChild(ageLimitInput);
@@ -203,14 +202,14 @@ function main() {
 
     let buttonContainer = createInputContainer();
     buttonContainer.style.textAlign = 'right';
-    let recommendButton = document.createElement("button");
-    recommendButton.innerText = "Otsi";
-    recommendButton.style.backgroundColor = 'lightblue';
-    recommendButton.style.borderStyle = 'solid';
-    recommendButton.style.borderWidth = '1px';
-    recommendButton.style.borderColor = "blue";
-    recommendButton.style.marginTop = '20px';
-    recommendButton.addEventListener('click', function() {
+    let searchButton = document.createElement("button");
+    searchButton.innerText = "Otsi";
+    searchButton.style.backgroundColor = 'lightblue';
+    searchButton.style.borderStyle = 'solid';
+    searchButton.style.borderWidth = '1px';
+    searchButton.style.borderColor = "blue";
+    searchButton.style.marginTop = '20px';
+    searchButton.addEventListener('click', function() {
 
         let ageLimit = ageLimitInput.value;
         let genres = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
@@ -218,9 +217,24 @@ function main() {
         let language = languageInput.value;
 
         removeAllChildNodes(mainDiv);
-        showResults(ageLimit, genres, date, language);
-        console.log("Otsin");
+        showResults(ageLimit, genres, date, language); // Search for given movie
     });
+
+
+    let recommendButton = document.createElement("button");
+    recommendButton.innerText = "Soovita vaatamiste põhja";
+    recommendButton.style.backgroundColor = 'orange';
+    recommendButton.style.borderStyle = 'solid';
+    recommendButton.style.borderWidth = '1px';
+    recommendButton.style.borderColor = "blue";
+    recommendButton.style.marginTop = '20px';
+    recommendButton.addEventListener('click', function() {
+
+        findRecommendations(); // Search based on history
+
+    });
+
+    buttonContainer.appendChild(searchButton);
     buttonContainer.appendChild(recommendButton);
 
     mainDiv.appendChild(ageLimitContainer);
@@ -230,6 +244,94 @@ function main() {
     mainDiv.appendChild(buttonContainer);
 }
 
+function findRecommendations() {
+
+    let genreFrequencyMap = new Map();
+    let mainDiv = document.querySelector("#main");
+
+    removeAllChildNodes(mainDiv);
+
+    let backButton = document.createElement("button");
+    let scrollableDiv = document.createElement('div');
+
+    scrollableDiv.style.width = '900px'
+    scrollableDiv.style.height = '500px';
+    scrollableDiv.style.overflowY = 'auto';
+    scrollableDiv.style.border = '1px solid #ccc';
+
+    backButton.innerText = "Tagasi";
+    backButton.style.backgroundColor = 'lightblue';
+    backButton.style.borderStyle = 'solid';
+    backButton.style.borderWidth = '1px';
+    backButton.style.borderColor = "blue"
+
+    backButton.addEventListener('click', function() {
+        removeAllChildNodes(mainDiv);
+        main();
+    });
+
+    mainDiv.appendChild(backButton);
+
+    fetch('http://localhost:8080/api/tickets', {
+        method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+        let promises = data.map(ticket => {
+            return fetch('http://localhost:8080/api/movies/genre/' + ticket['movie'], {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(genres => {
+                for (let genre of genres) {
+                    let count = genreFrequencyMap.get(genre.name) || 0;
+                    genreFrequencyMap.set(genre.name, count + 1);
+                }
+            });
+        });
+
+        Promise.all(promises)
+        .then(() => {
+            let genreFrequencies = Array.from(genreFrequencyMap.entries());
+
+            genreFrequencies.sort((a, b) => b[1] - a[1]);
+
+            fetch('http://localhost:8080/api/showings', {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                let genres = [];
+
+                if (genreFrequencies.length >= 2) {
+                    genres = [genreFrequencies[0][0], genreFrequencies[1][0]];
+                } else if (genreFrequencies.length === 1) {
+                    genres = [genreFrequencies[0][0]];
+                } else {
+                    alert("Teil ei ole eelnevaid vaatmisi.")
+                    return showResults("", [], "", "");
+                }
+    
+                const lowerCaseGenres = genres.map(genre => genre.toLowerCase());
+
+                data = data.filter(showing => {
+                    const showingGenres = showing.genres.map(genre => genre.toLowerCase());
+                    return lowerCaseGenres.some(genre => showingGenres.includes(genre));
+                });                
+            
+                createTable(data, scrollableDiv, mainDiv);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
+
 // ==================== ENTRY POINT ===================
-console.log("App startup...");
 main();

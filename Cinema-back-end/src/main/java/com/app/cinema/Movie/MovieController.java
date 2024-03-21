@@ -1,5 +1,6 @@
 package com.app.cinema.Movie;
 
+import com.app.cinema.Genre.Genre;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,11 @@ public class MovieController {
     @GetMapping("{id}")
     public Movie getMovieId(@PathVariable("id") Integer id) {
         return movieService.getMovie(id);
+    }
+
+    @GetMapping("genre/{name}")
+    public List<Genre> getGenres(@PathVariable("name") String name) {
+        return movieService.getGenres(name);
     }
 
     @PostMapping

@@ -25,6 +25,7 @@ public class TicketDataAccessService implements ITicketDAO {
             LEFT JOIN seat s ON t.seat = s.id
             LEFT JOIN showing sh ON t.showing = sh.id
             LEFT JOIN movie m ON sh.movie = m.id
+            ORDER BY sh.start ASC
             LIMIT 100;
             """;
 

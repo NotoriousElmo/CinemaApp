@@ -62,5 +62,4 @@ function main () {
 }
 
 // ==================== ENTRY POINT ===================
-console.log("App startup...");
 main();

@@ -1,6 +1,7 @@
 package com.app.cinema.Movie;
 
 import com.app.cinema.Exception.NotFoundException;
+import com.app.cinema.Genre.Genre;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,6 +41,10 @@ public class MovieService {
         }, () -> {
             throw new NotFoundException(String.format("Movie with id %s not found", id));
         });
+    }
+
+    public List<Genre> getGenres(String name) {
+        return movieDao.selectGenreByMovieName(name);
     }
 
     public Movie getMovie(int id) {

@@ -1,5 +1,7 @@
 package com.app.cinema.Movie;
 
+import com.app.cinema.Genre.Genre;
+import com.app.cinema.Genre.GenreRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -50,6 +52,17 @@ public class MovieDataAccessService implements IMovieDAO {
     }
 
     @Override
+    public List<Genre> selectGenreByMovieName(String name) {
+        String sql = """
+                SELECT g.id, g.name
+                FROM movie m
+                LEFT JOIN movie_genre mg on m.id = mg.movie
+                LEFT JOIN genre g on mg.genre = g.id
+                WHERE m.name LIKE ?;
+                """;
+        return jdbcTemplate.query(sql, new GenreRowMapper(), "%" + name + "%");
+    }
+
     public Optional<Movie> selectMovieById(int id) {
         String sql = """
                 SELECT *

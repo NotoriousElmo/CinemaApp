@@ -30,6 +30,7 @@ public class ShowingDataAccessService implements IShowingDAO {
                 LEFT JOIN genre g on mg.genre = g.id
                 WHERE sh.start > now()
                 GROUP BY sh.id, m.id, c.id
+                ORDER BY sh.start ASC
                 LIMIT 100;
                 """;
 
