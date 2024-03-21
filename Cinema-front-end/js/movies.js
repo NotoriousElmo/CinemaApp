@@ -251,26 +251,12 @@ function findRecommendations() {
 
     removeAllChildNodes(mainDiv);
 
-    let backButton = document.createElement("button");
     let scrollableDiv = document.createElement('div');
 
     scrollableDiv.style.width = '900px'
     scrollableDiv.style.height = '500px';
     scrollableDiv.style.overflowY = 'auto';
     scrollableDiv.style.border = '1px solid #ccc';
-
-    backButton.innerText = "Tagasi";
-    backButton.style.backgroundColor = 'lightblue';
-    backButton.style.borderStyle = 'solid';
-    backButton.style.borderWidth = '1px';
-    backButton.style.borderColor = "blue"
-
-    backButton.addEventListener('click', function() {
-        removeAllChildNodes(mainDiv);
-        main();
-    });
-
-    mainDiv.appendChild(backButton);
 
     fetch('http://localhost:8080/api/tickets', {
         method: 'GET',
@@ -312,6 +298,21 @@ function findRecommendations() {
                     alert("Teil ei ole eelnevaid vaatmisi.")
                     return showResults("", [], "", "");
                 }
+
+                let backButton = document.createElement("button");
+
+                backButton.innerText = "Tagasi";
+                backButton.style.backgroundColor = 'lightblue';
+                backButton.style.borderStyle = 'solid';
+                backButton.style.borderWidth = '1px';
+                backButton.style.borderColor = "blue"
+            
+                backButton.addEventListener('click', function() {
+                    removeAllChildNodes(mainDiv);
+                    main();
+                });
+            
+                mainDiv.appendChild(backButton);
     
                 const lowerCaseGenres = genres.map(genre => genre.toLowerCase());
 

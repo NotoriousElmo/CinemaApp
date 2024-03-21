@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://10.102.0.218:8081")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("api/movie_genres")
 public class MovieGenreController {

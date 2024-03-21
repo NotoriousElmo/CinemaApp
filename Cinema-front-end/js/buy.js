@@ -216,9 +216,6 @@ function endPurchaseScreen(selectedSeats, showing) {
     let formattedTime = ("0" + date.getHours()).slice(-2) + ':' + ("0" + date.getMinutes()).slice(-2);
     
     selectedSeats.forEach(element => {
-        console.log(element['seatId']);
-        console.log(element['seatCode']);
-        console.log(element['room']);
 
         let row = document.createElement('tr');
 
@@ -274,7 +271,6 @@ function endPurchaseScreen(selectedSeats, showing) {
             headers: {
                 'Content-Type': 'application/json',
                 'Connection': 'keep-alive',
-                'Origin': 'http://10.102.0.218:8081'
             },
             body: JSON.stringify(data)
         })
