@@ -42,7 +42,7 @@ DEVELOPMENT PROCESS
 * Then I created the initial database schema.
 * Programming of the app began at 15th of March.
 * In the beginning most of the time went to setting up docker and the database.
-* In total the whole development process took probably around 30 hours + the time it took to learn.
+* In total the whole development process took probably around 30 hours + the time it took to learn several subjects related to the project.
 * Main difficulties I faced was fixing different bugs and errors that occured, initially it was setting up the database and later it was fetching data from and to the back-end API.
 
 USED TUTORIALS
