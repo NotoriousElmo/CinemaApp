@@ -10,7 +10,7 @@ public class TicketRowMapper implements RowMapper<Ticket> {
     public Ticket mapRow(ResultSet resultSet, int i) throws SQLException {
         return new Ticket(
                 resultSet.getInt("id"),
-                resultSet.getFloat("price"),
+                resultSet.getBigDecimal("price"),
                 resultSet.getInt("seatId"),
                 resultSet.getString("code"),
                 resultSet.getString("room"),

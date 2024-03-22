@@ -2,6 +2,6 @@ CREATE TABLE ticket (
    id BIGSERIAL PRIMARY KEY,
    seat BIGINT REFERENCES seat (id),
    showing BIGINT REFERENCES showing (id),
-   price FLOAT NOT NULL,
+   price DECIMAL NOT NULL,
    unique (seat, showing)
 );

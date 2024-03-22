@@ -1,5 +1,6 @@
 package com.app.cinema.Showing;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 public record Showing(
@@ -13,7 +14,7 @@ public record Showing(
         String room,
         Integer length_minutes,
         String language,
-        Float price,
+        BigDecimal price,
         String[] genres
 ) {
 }
