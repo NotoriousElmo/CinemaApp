@@ -9,23 +9,11 @@ function purchaseTicket() {
     const numberTickets = localStorage.getItem(showing['id']);
     let mainDiv = document.querySelector("#main");
 
+    let instructions = getInstructions();
 
-    let instructions = document.createElement("p");
-    instructions.innerText = "1) Valitud istekohad on kollased.\n2) Sa ei saa valida rohkem istekohtasid kui sa deklareerisid.\n3) Teiste istekohtade valimiseks vajutage kollaste istekohtade peale, et need siniseks muuta ja siis valige uued.";
     mainDiv.appendChild(instructions);
 
-    let backButton = document.createElement("button");
-    backButton.innerText = "Tagasi";
-    backButton.style.backgroundColor = 'lightblue';
-    backButton.style.borderStyle = 'solid';
-    backButton.style.borderWidth = '1px';
-    backButton.style.borderColor = "blue"
-
-    backButton.addEventListener('click', function() {
-        removeAllChildNodes(mainDiv);
-        localStorage.clear();
-        window.location.href = 'movies.html';
-    });
+    let backButton = createInitialBackButton(mainDiv);
 
     mainDiv.appendChild(backButton);
 
@@ -46,59 +34,7 @@ function purchaseTicket() {
             isTaken: Math.random() < 0.2,
         }));
 
-        let tbody = document.createElement('tbody');
-        let selectedSeats = recommendSeats(seats, numberTickets);
-
-        let screen = document.createElement('tr');
-        screen.innerText = '------------------------- Ekraan -------------------------\n\n'
-        screen.style.textAlign = 'center';
-        tbody.appendChild(screen);
-
-        for (let index = 0; index < 5; index++) {            
-            let row = document.createElement('tr');
-        
-            for (let i = index * 10; i < (index + 1) * 10; i++) {
-                const element = seats[i];
-                let seatButton = document.createElement('button');
-
-                seatButton.style.borderStyle = 'solid';
-                seatButton.style.borderWidth = '1px';
-                seatButton.style.borderColor = 'blue';
-                seatButton.style.marginTop = '5px';
-                seatButton.style.width = '40px';
-        
-                if (element.isTaken) {
-                    seatButton.style.backgroundColor = 'grey';
-                    seatButton.innerText = '-';
-                    seatButton.disabled = true;
-                } else {
-                    if (selectedSeats.includes(element)) {
-                        seatButton.style.backgroundColor = 'yellow';
-                    } else {                        
-                        seatButton.style.backgroundColor = 'lightblue';
-                    }
-                    seatButton.innerText = element.seatCode;
-                    seatButton.addEventListener('click', function() {
-                        if (this.style.backgroundColor === 'yellow') {
-                            this.style.backgroundColor = 'lightblue';
-                            const seatIndex = selectedSeats.indexOf(element);
-                            if (seatIndex > -1) {
-                                selectedSeats.splice(seatIndex, 1);
-                            }
-                        } else {
-                            if (selectedSeats.length < numberTickets) {
-                                this.style.backgroundColor = 'yellow';
-                                selectedSeats.push(element);
-                            }
-                        }
-                    });
-                }
-        
-                row.appendChild(seatButton);
-            }
-        
-            tbody.appendChild(row);
-        }
+        let { tbody, selectedSeats } = createInitialTableBody(seats, numberTickets);
         table.appendChild(tbody);
         mainDiv.appendChild(table);
 
@@ -109,6 +45,100 @@ function purchaseTicket() {
     .catch((error) => {
         console.error('Error:', error);
     });
+}
+
+function createInitialTableBody(seats, numberTickets) {
+    let tbody = document.createElement('tbody');
+    let selectedSeats = recommendSeats(seats, numberTickets);
+
+    let screen = createScreen();
+    tbody.appendChild(screen);
+
+    for (let index = 0; index < 5; index++) {
+        let row = createTableRow(index, seats, selectedSeats, numberTickets);
+
+        tbody.appendChild(row);
+    }
+    return { tbody, selectedSeats };
+}
+
+function createTableRow(index, seats, selectedSeats, numberTickets) {
+    let row = document.createElement('tr');
+
+    for (let i = index * 10; i < (index + 1) * 10; i++) {
+        const element = seats[i];
+        let seatButton = createSeatButton(element, selectedSeats, numberTickets);
+
+        row.appendChild(seatButton);
+    }
+    return row;
+}
+
+function createSeatButton(element, selectedSeats, numberTickets) {
+    let seatButton = document.createElement('button');
+
+    seatButton.style.borderStyle = 'solid';
+    seatButton.style.borderWidth = '1px';
+    seatButton.style.borderColor = 'blue';
+    seatButton.style.marginTop = '5px';
+    seatButton.style.width = '40px';
+
+    if (element.isTaken) {
+        seatButton.style.backgroundColor = 'grey';
+        seatButton.innerText = '-';
+        seatButton.disabled = true;
+    } else {
+        if (selectedSeats.includes(element)) {
+            seatButton.style.backgroundColor = 'yellow';
+        } else {
+            seatButton.style.backgroundColor = 'lightblue';
+        }
+        seatButton.innerText = element.seatCode;
+        seatButton.addEventListener('click', function () {
+            if (this.style.backgroundColor === 'yellow') {
+                this.style.backgroundColor = 'lightblue';
+                const seatIndex = selectedSeats.indexOf(element);
+                if (seatIndex > -1) {
+                    selectedSeats.splice(seatIndex, 1);
+                }
+            } else {
+                if (selectedSeats.length < numberTickets) {
+                    this.style.backgroundColor = 'yellow';
+                    selectedSeats.push(element);
+                }
+            }
+        });
+    }
+    return seatButton;
+}
+
+function createScreen() {
+    let screen = document.createElement('tr');
+    screen.innerText = '------------------------- Ekraan -------------------------\n\n';
+    screen.style.textAlign = 'center';
+    return screen;
+}
+
+function getInstructions() {
+    let instructions = document.createElement("p");
+    instructions.innerText = "1) Valitud istekohad on kollased.\n2) Sa ei saa valida rohkem istekohtasid kui sa deklareerisid.\n3) Teiste istekohtade valimiseks vajutage kollaste istekohtade peale, et need siniseks muuta ja siis valige uued.";
+    return instructions;
+}
+
+function createInitialBackButton(mainDiv) {
+    let backButton = document.createElement("button");
+    backButton.innerText = "Tagasi";
+    backButton.style.backgroundColor = 'lightblue';
+    backButton.style.borderStyle = 'solid';
+    backButton.style.borderWidth = '1px';
+    backButton.style.borderColor = "blue";
+
+    backButton.addEventListener('click', function () {
+        removeAllChildNodes(mainDiv);
+        localStorage.clear();
+        window.location.href = 'movies.html';
+    });
+    return backButton;
 }
 
 function recommendSeats(seats, numberOfSeatsNeeded) {
@@ -172,26 +202,84 @@ function createPurchaseButton(selectedSeats, mainDiv, showing) {
 }
 
 function endPurchaseScreen(selectedSeats, showing) {
-
     const price = showing['price'];
     let movie = showing['movie'];
-    
+
     let mainDiv = document.querySelector("#main");
 
-    let backButton = document.createElement("button");
-    backButton.innerText = "Tagasi";
-    backButton.style.backgroundColor = 'lightblue';
-    backButton.style.borderStyle = 'solid';
-    backButton.style.borderWidth = '1px';
-    backButton.style.borderColor = "blue"
-
-    backButton.addEventListener('click', function() {
-        removeAllChildNodes(mainDiv);
-        purchaseTicket();
-    });
-
+    let backButton = createEndBackButton(mainDiv);
     mainDiv.appendChild(backButton);
 
+    let table = createEndTable(showing, selectedSeats, movie, price);
+    mainDiv.appendChild(table);
+
+    let recieptRow = createTotalRecieptRow(price, selectedSeats);
+    mainDiv.appendChild(recieptRow);
+    
+    let purchaseButton = crateEndPurchaseButton(selectedSeats, price, showing);
+
+    mainDiv.appendChild(purchaseButton);
+}
+
+function crateEndPurchaseButton(selectedSeats, price, showing) {
+    let purchaseButton = document.createElement("button");
+    purchaseButton.innerText = "Osta";
+    purchaseButton.style.fontSize = '20px';
+
+    purchaseButton.addEventListener('click', function () {
+
+        purchaseTickets(selectedSeats, price, showing);
+
+        window.location.href = '../index.html';
+    });
+    return purchaseButton;
+}
+
+function purchaseTickets(selectedSeats, price, showing) {
+    for (let i = 0; i < selectedSeats.length; i++) {
+        let element = selectedSeats[i];
+        let url = 'http://localhost:8080/api/tickets';
+        let data = createTicketRequestData(price, element, showing);
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Connection': 'keep-alive',
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+}
+
+function createTicketRequestData(price, element, showing) {
+    return {
+        price: price,
+        seatId: element['seatId'],
+        seat: element['seatCode'],
+        room: element['room'],
+        showingId: showing['id'],
+        showing: showing['start'],
+        movie: showing['movie'],
+        age: showing['age'],
+        language: showing['language'],
+        length_minutes: showing['length_minutes']
+    };
+}
+
+function createTotalRecieptRow(price, selectedSeats) {
+    let recieptRow = document.createElement('p');
+    recieptRow.innerText = 'Summa kokku: ' + price * selectedSeats.length + '€';
+    recieptRow.style.fontSize = '20px';
+    recieptRow.style.fontWeight = 'bold';
+    return recieptRow;
+}
+
+function createEndTable(showing, selectedSeats, movie, price) {
     let table = document.createElement('table');
     table.style.borderSpacing = "30px";
     table.style.fontSize = '20px';
@@ -214,7 +302,7 @@ function endPurchaseScreen(selectedSeats, showing) {
 
     let formattedDate = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
     let formattedTime = ("0" + date.getHours()).slice(-2) + ':' + ("0" + date.getMinutes()).slice(-2);
-    
+
     selectedSeats.forEach(element => {
 
         let row = document.createElement('tr');
@@ -236,56 +324,23 @@ function endPurchaseScreen(selectedSeats, showing) {
         row.appendChild(p);
         table.appendChild(row);
     });
-
-    mainDiv.appendChild(table);
-
-    let recieptRow = document.createElement('p');
-    recieptRow.innerText = 'Summa kokku: ' + price * selectedSeats.length + '€';
-    recieptRow.style.fontSize = '20px';
-    recieptRow.style.fontWeight = 'bold';
-
-    mainDiv.appendChild(recieptRow);
-    
-    let purchaseButton = document.createElement("button");
-    purchaseButton.innerText = "Osta";
-    purchaseButton.style.fontSize = '20px';
-
-    purchaseButton.addEventListener('click', function() {
-
-    for (let i = 0; i < selectedSeats.length; i++) {
-        let element = selectedSeats[i];
-        let url = 'http://localhost:8080/api/tickets';
-        let data = {price: price, 
-            seatId: element['seatId'], 
-            seat: element['seatCode'], 
-            room: element['room'], 
-            showingId: showing['id'], 
-            showing: showing['start'], 
-            movie: showing['movie'], 
-            age: showing['age'], 
-            language: showing['language'], 
-            length_minutes: showing['length_minutes']};
-        
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Connection': 'keep-alive',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
-
-    window.location.href = '../index.html';
-    })
-
-    mainDiv.appendChild(purchaseButton);
+    return table;
 }
 
+function createEndBackButton(mainDiv) {
+    let backButton = document.createElement("button");
+    backButton.innerText = "Tagasi";
+    backButton.style.backgroundColor = 'lightblue';
+    backButton.style.borderStyle = 'solid';
+    backButton.style.borderWidth = '1px';
+    backButton.style.borderColor = "blue";
+
+    backButton.addEventListener('click', function () {
+        removeAllChildNodes(mainDiv);
+        purchaseTicket();
+    });
+    return backButton;
+}
 
 // ==================== ENTRY POINT ===================
 purchaseTicket();
