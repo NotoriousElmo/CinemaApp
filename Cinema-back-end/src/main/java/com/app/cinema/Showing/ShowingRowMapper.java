@@ -23,7 +23,7 @@ public class ShowingRowMapper implements RowMapper<Showing> {
                 resultSet.getString("room"),
                 resultSet.getInt("length_minutes"),
                 resultSet.getString("language"),
-                resultSet.getBigDecimal("price"),
+                resultSet.getFloat("price"),
                 genres
         );
     }

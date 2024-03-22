@@ -1,11 +1,10 @@
 package com.app.cinema.Ticket;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 public record Ticket(
         Integer id,
-        BigDecimal price,
+        Float price,
         Integer seatId,
         String seat,
         String room,

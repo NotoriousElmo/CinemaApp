@@ -227,38 +227,34 @@ function crateEndPurchaseButton(selectedSeats, price, showing) {
     purchaseButton.style.fontSize = '20px';
 
     purchaseButton.addEventListener('click', function () {
-        purchaseTickets(selectedSeats, price, showing)
-        .then(() => {
-            window.location.href = '../index.html';
-        });
+
+        purchaseTickets(selectedSeats, price, showing);
+
+        window.location.href = '../index.html';
     });
     return purchaseButton;
 }
 
-
 function purchaseTickets(selectedSeats, price, showing) {
-    let requests = selectedSeats.map(async element => {
+    for (let i = 0; i < selectedSeats.length; i++) {
+        let element = selectedSeats[i];
         let url = 'http://localhost:8080/api/tickets';
         let data = createTicketRequestData(price, element, showing);
 
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Connection': 'keep-alive',
-                },
-                body: JSON.stringify(data)
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Connection': 'keep-alive',
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .catch((error) => {
+                console.error('Error:', error);
             });
-            return await response.json();
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
-
-    return Promise.all(requests);
+    }
 }
-
 
 function createTicketRequestData(price, element, showing) {
     return {
@@ -277,7 +273,7 @@ function createTicketRequestData(price, element, showing) {
 
 function createTotalRecieptRow(price, selectedSeats) {
     let recieptRow = document.createElement('p');
-    recieptRow.innerText = 'Summa kokku: ' + (price * selectedSeats.length).toFixed(2) + '€';
+    recieptRow.innerText = 'Summa kokku: ' + price * selectedSeats.length + '€';
     recieptRow.style.fontSize = '20px';
     recieptRow.style.fontWeight = 'bold';
     return recieptRow;
@@ -302,13 +298,11 @@ function createEndTable(showing, selectedSeats, movie, price) {
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
-    let { formattedDate, formattedTime } = formatDate(showing);
+    let date = new Date(showing['start']);
 
-    createRecieptTable(selectedSeats, formattedDate, formattedTime, movie, price, table);
-    return table;
-}
+    let formattedDate = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
+    let formattedTime = ("0" + date.getHours()).slice(-2) + ':' + ("0" + date.getMinutes()).slice(-2);
 
-function createRecieptTable(selectedSeats, formattedDate, formattedTime, movie, price, table) {
     selectedSeats.forEach(element => {
 
         let row = document.createElement('tr');
@@ -330,14 +324,7 @@ function createRecieptTable(selectedSeats, formattedDate, formattedTime, movie, 
         row.appendChild(p);
         table.appendChild(row);
     });
-}
-
-function formatDate(showing) {
-    let date = new Date(showing['start']);
-
-    let formattedDate = ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
-    let formattedTime = ("0" + date.getHours()).slice(-2) + ':' + ("0" + date.getMinutes()).slice(-2);
-    return { formattedDate, formattedTime };
+    return table;
 }
 
 function createEndBackButton(mainDiv) {
